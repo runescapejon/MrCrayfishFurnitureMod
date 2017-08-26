@@ -36,31 +36,38 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
+import java.io.IOException;
 
-public class GuiEnvelope extends GuiContainer
-{
+public class GuiEnvelope extends GuiContainer {
 	private static final ResourceLocation gui = new ResourceLocation("cfm:textures/gui/envelope.png");
 	private GuiButton buttonOk;
 	private EntityPlayer player;
 	private InventoryEnvelope inventory;
 	private ItemStack mail;
 
-	public GuiEnvelope(InventoryPlayer inventoryplayer, IInventory inventoryMail, EntityPlayer player, ItemStack mail)
-	{
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		super.keyTyped(typedChar, keyCode);
+	}
+
+	public GuiEnvelope(InventoryPlayer inventoryplayer, IInventory inventoryMail, EntityPlayer player, ItemStack mail) {
 		super(new ContainerEnvelope(inventoryplayer, inventoryMail));
 		this.player = player;
 		this.inventory = (InventoryEnvelope) inventoryMail;
 		this.mail = mail;
 	}
 
-	protected void drawGuiContainerForegroundLayer(int par1, int par2)
-	{
+	protected void drawGuiContainerForegroundLayer(int par1, int par2) {
 		this.fontRendererObj.drawString("Envelope", xSize / 2 - 22, 5, 9999999);
 		this.fontRendererObj.drawString("Inventory", 8, (ySize - 96) + 2, 4210752);
 	}
 
-	protected void drawGuiContainerBackgroundLayer(float f, int i, int j)
-	{
+	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(gui);
 		int l = (width - xSize) / 2;
@@ -69,18 +76,16 @@ public class GuiEnvelope extends GuiContainer
 	}
 
 	@Override
-	public void initGui()
-	{
+	public void initGui() {
 		super.initGui();
 		Keyboard.enableRepeatEvents(false);
-		
+
 		buttonList.clear();
-		
+
 		int posX = width / 2 + 40;
 		int posY = height / 2 - 50;
-		
-		if (mail.getItem() == FurnitureItems.itemEnvelope)
-		{
+
+		if (mail.getItem() == FurnitureItems.itemEnvelope) {
 			buttonOk = new GuiButton(0, posX, posY, 40, 20, "Sign");
 			buttonOk.enabled = true;
 			buttonList.add(buttonOk);
@@ -88,29 +93,22 @@ public class GuiEnvelope extends GuiContainer
 	}
 
 	@Override
-	public void onGuiClosed()
-	{
+	public void onGuiClosed() {
 		super.onGuiClosed();
 		this.inventory.saveInventory();
 	}
 
 	@Override
-	protected void actionPerformed(GuiButton guibutton)
-	{
-		if (!guibutton.enabled)
-		{
+	protected void actionPerformed(GuiButton guibutton) {
+		if (!guibutton.enabled) {
 			return;
 		}
-		if (guibutton.id == 0)
-		{
+		if (guibutton.id == 0) {
 			NBTTagList list = (NBTTagList) NBTHelper.getCompoundTag(mail, "Envelope").getTag("Items");
-			if (list.tagCount() > 0)
-			{
+			if (list.tagCount() > 0) {
 				PacketHandler.INSTANCE.sendToServer(new MessageEnvelope(this.mail));
 				this.mc.displayGuiScreen(null);
-			}
-			else
-			{
+			} else {
 				this.player.addChatMessage(new TextComponentString("You cannot sign an empty envelope."));
 			}
 		}

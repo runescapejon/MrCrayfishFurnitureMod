@@ -24,22 +24,24 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 
 public class ContainerPackage extends Container
 {
+	private int index;
 	private IInventory packageInventory;
 
 	public ContainerPackage(IInventory playerInventory, IInventory packageInventory)
 	{
+		this.index = ((InventoryPlayer) playerInventory).currentItem;
 		this.packageInventory = packageInventory;
 		packageInventory.openInventory(null);
 
-		this.addSlotToContainer(new SlotPackage(packageInventory, 0, 8 + 0 * 18 + 54, 18 + 0 * 18 - 3));
-		this.addSlotToContainer(new SlotPackage(packageInventory, 1, 8 + 0 * 18 + 54, 18 + 1 * 18 - 3));
-		this.addSlotToContainer(new SlotPackage(packageInventory, 2, 8 + 1 * 18 + 54, 18 + 0 * 18 - 3));
-		this.addSlotToContainer(new SlotPackage(packageInventory, 3, 8 + 1 * 18 + 54, 18 + 1 * 18 - 3));
-		this.addSlotToContainer(new SlotPackage(packageInventory, 4, 8 + 2 * 18 + 54, 18 + 0 * 18 - 3));
-		this.addSlotToContainer(new SlotPackage(packageInventory, 5, 8 + 2 * 18 + 54, 18 + 1 * 18 - 3));
+		for (int i = 0; i < 9; i++)
+		{
+			this.addSlotToContainer(new Slot(playerInventory, i, i * 18 + 8, 142));
+		}
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -49,10 +51,12 @@ public class ContainerPackage extends Container
 			}
 		}
 
-		for (int i = 0; i < 9; i++)
-		{
-			this.addSlotToContainer(new Slot(playerInventory, i, i * 18 + 8, 142));
-		}
+		this.addSlotToContainer(new SlotPackage(packageInventory, 0, 8 + 0 * 18 + 54, 18 + 0 * 18 - 3));
+		this.addSlotToContainer(new SlotPackage(packageInventory, 1, 8 + 0 * 18 + 54, 18 + 1 * 18 - 3));
+		this.addSlotToContainer(new SlotPackage(packageInventory, 2, 8 + 1 * 18 + 54, 18 + 0 * 18 - 3));
+		this.addSlotToContainer(new SlotPackage(packageInventory, 3, 8 + 1 * 18 + 54, 18 + 1 * 18 - 3));
+		this.addSlotToContainer(new SlotPackage(packageInventory, 4, 8 + 2 * 18 + 54, 18 + 0 * 18 - 3));
+		this.addSlotToContainer(new SlotPackage(packageInventory, 5, 8 + 2 * 18 + 54, 18 + 1 * 18 - 3));
 	}
 
 	@Override
@@ -64,6 +68,7 @@ public class ContainerPackage extends Container
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotNum)
 	{
+		if(slotNum == index) return null;
 		ItemStack itemCopy = null;
 		Slot slot = (Slot) this.inventorySlots.get(slotNum);
 
@@ -98,10 +103,10 @@ public class ContainerPackage extends Container
 	}
 
 	@Override
-	public void onContainerClosed(EntityPlayer player)
+	public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
 	{
-		super.onContainerClosed(player);
-		packageInventory.closeInventory(player);
+		if(slotId == index) return null;
+		return super.slotClick(slotId, dragType, clickTypeIn, player);
 	}
 
 }
